@@ -2,8 +2,9 @@
 Une application web de gestion des réservations de catway. 
 Créer via Express
 >npm install express –save
+
 Utilisation d'une API en utilisant MongoDB comme base de données
-> >npm install express-generator -g
+>npm install express-generator -g
 >express api --no-view
 
 
