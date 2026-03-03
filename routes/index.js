@@ -1,0 +1,180 @@
+/**
+ * @fileoverview Routes principales de l'application
+ * Gère l'authentification, le tableau de bord et les pages statiques
+ * @requires express
+ * @requires ../models/user
+ * @requires ../models/catway
+ * @requires ../models/reservations
+ * @requires ../middlewares/authenticated
+ * @requires bcrypt
+ */
+
+const express = require('express');
+const router = express.Router();
+const User = require('../models/user')
+const Catway = require('../models/catway')
+const Reservation = require('../models/reservations')
+const { isAuthenticated } = require('../middlewares/authenticated');
+const bcrypt = require('bcrypt');
+
+
+
+/**
+ * GET /documentation - Affiche la page de documentation de l'API
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Affiche le modèle documentation
+ */
+router.get('/documentation', (req, res) => {
+    res.render('documentation', { title: 'Documentation API' });
+});
+
+
+/**
+ * GET /dashboard - Affiche le tableau de bord avec les statistiques
+ * @async
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} req.session.user - L'utilisateur authentifié
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Affiche le modèle dashboard avec les statistiques
+ * @throws {Error} Erreur 500 si le chargement du tableau de bord échoue
+ * @requires isAuthenticated - Middleware de vérification d'authentification
+ */
+// Route protégée
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+    try {
+        // Récupérer les données nécessaires pour le tableau de bord
+        const totalCatways = await Catway.countDocuments();
+        const totalUsers = await User.countDocuments();
+        const totalReservations = await Reservation.countDocuments();
+        
+        const allReservations = await Reservation.find();
+
+        res.render('dashboard', {  
+            title: 'Tableau de Bord',
+            user: req.session.user,
+            dataDuJour: new Date().toLocaleDateString('fr-FR'),
+            totalCatways: totalCatways,
+            totalUsers: totalUsers,
+            totalReservations: totalReservations,
+            reservations : allReservations,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erreur lors du chargement du tableau de bord.');
+    }
+});
+
+
+
+
+/**
+ * GET /crud - Affiche la page de gestion des données
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} req.session.user - L'utilisateur authentifié
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Affiche le modèle crud
+ * @requires isAuthenticated - Middleware de vérification d'authentification
+ */
+// Route CRUD - Protégée
+router.get('/crud', isAuthenticated, (req, res) => {
+    res.render('crud', { title: 'Gestion des Données' });
+});
+
+
+/**
+ * GET /login - Affiche le formulaire de connexion
+ * @param {Object} req - Objet de requête Express
+ * @param {string} req.query.error - Message d'erreur optionnel du formulaire
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Affiche le modèle de connexion
+ */
+// Route pour afficher le formulaire de connexion
+router.get('/login', (req, res) => {
+    res.render('login', { 
+        title: 'Connexion', 
+        message: req.query.error ? 'Nom d\'utilisateur ou mot de passe incorrect.' : null 
+    });
+});
+
+
+/**
+ * POST /login - Gère l'authentification de l'utilisateur
+ * @async
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} req.body - Données du formulaire de connexion
+ * @param {string} req.body.email - L'adresse email de l'utilisateur
+ * @param {string} req.body.password - Le mot de passe de l'utilisateur
+ * @param {Object} req.session - Session de l'utilisateur
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Redirige vers /dashboard en cas de succès
+ * @throws {Error} Erreur 401 si les identifiants sont invalides
+ * @throws {Error} Erreur 500 en cas d'erreur serveur
+ */
+//routes de connection et de deconnection
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+   console.log("Tentative de connexion pour :", email);
+
+  try {
+    const user = await User.findOne({ email: email});
+    if (!user) {
+      return res.status(401).render('index', {title : 'Accueil', error: 'Identifiants invalides.'});
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).render('index', { title: 'Accueil', error: 'Identifiant invalide'});
+    }
+    req.session.user ={
+      id: user._id,
+      username: user.username,
+      email: user.email
+    };
+
+    res.redirect('/dashboard');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur serveur lors de la connexion.');
+  }
+});
+
+/**
+ * GET /logout - Déconnecte l'utilisateur
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} req.session - Session de l'utilisateur
+ * @param {Object} res - Objet de réponse Express
+ * @returns {void} Redirige vers la page d'accueil
+ * @throws {Error} Erreur 500 si la déconnexion échoue
+ */
+router.get('/logout', (req,res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Erreur serveur lors de la déconnection.');
+    }
+    res.redirect('/');
+  });
+});
+
+
+
+/**
+ * GET / - Affiche la page d'accueil
+ * Redirige vers le tableau de bord si l'utilisateur est déjà authentifié
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} req.session.user - L'utilisateur authentifié (si présent)
+ * @param {Object} res - Objet de réponse Express
+ * @param {Function} next - Fonction middleware suivante
+ * @returns {void} Affiche le modèle index ou redirige vers /dashboard
+ */
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  if (req.session.user) {
+    return res.redirect('/dashboard');
+  }
+  res.render('index', { title: 'Accueil - Port Russell' });
+});
+
+/**
+ * Exporte le module routeur pour utilisation dans l'application principale
+ */
+module.exports = router;

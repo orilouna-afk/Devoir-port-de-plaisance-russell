@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs</title>
+</head>
+<body>
+    <header>
+        <h1>Gestion des Utilisateurs</h1>
+    </header>
+    <main>
+        <h2>Ajouter un utilisateur</h2>
+        <form action="/gestionusers" method="post"> 
+             <label for="email">Nom d'utilisateur:</label>
+            <input type="email" id="email" name="email" required>
+
+             <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Créer</button>
+        </form>
+
+        <div>
+            <h2>Liste des utilisateurs</h2>
+            <ul>
+                <% users.forEach(function(user) { %>
+                    <li>
+                        <div>
+                            Nom d'utilisateur :  <%= user.email %> 
+                        </div>
+                        <div>
+                            <form action="/gestionusers/update/<%= user._id%>" method="post">
+                           <input type="email" name="email" value="<%= user.email %>">
+                           <button type="submit">Modifier l'utilisateur</button> 
+                        </form>
+
+                        <form action="/gestionusers/delete/<%= user._id %>" method="post">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+        <p><a href="/dashboard">← Retour au Tableau de Bord</a></p>
+    </main>
+</body>
+</html>

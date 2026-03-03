@@ -1,0 +1,19 @@
+{
+  "source": {
+    "include": [
+      "models",
+      "routes"
+    ],
+    "exclude": [
+      "node_modules",
+      "public",
+      "views"
+    ],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+  "destination": "./docs",
+    "recurse": true
+    }
+}

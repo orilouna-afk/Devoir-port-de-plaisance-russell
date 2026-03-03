@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Réservations</title>
+</head>
+<body>
+    <header>
+        <h1>Gestion des réservations</h1>
+    </header>
+    <main>
+    <h2>Ajouter une réservation</h2>
+      <form action="/gestionreservation" method="post">
+        <label for="catwayNumber"> Catway : </label>
+        <input type="number" id="catwayNumber" name="catwayNumber" required>
+
+        <label for="clientName">Nom du client :</label>
+        <input type="text" id="clientName" name="clientName" required>
+
+        <label for="boatName">Nom du bateau :</label>
+        <input type="text" id="boatName" name="boatName" required>
+
+        
+        <label for="startDate">Date de début :</label>
+        <input type="date" id="startDate" name="startDate" required>
+
+        <label for="endDate">Date de fin :</label>
+        <input type="date" id="endDate" name="endDate" required>
+
+        <button type="submit">Créer la réservation</button>
+      
+       </form>
+    <h2>Listes des réservations</h2>
+
+        <ul>
+         <% reservation.forEach(function(reservation) { 
+             const startDate = new Date(reservation.startDate);
+             const endDate = new Date(reservation.endDate);
+            %> 
+            <li>
+                <div>
+                    Catway #<%= reservation.catwayNumber %> | 
+                            Client : <%= reservation.clientName %> | 
+                            Bateau : <%= reservation.boatName %><br>
+                            Du <%= startDate.toLocaleDateString('fr-FR') %> 
+                            au <%= endDate.toLocaleDateString('fr-FR') %>
+                </div>
+
+                <div>
+                    <form action="/gestionreservation/update/<%= reservation._id %>" method="POST" >
+                        <input type="text" name="clientName" value="<%= reservation.clientName %>" placeholder="Client" required>
+                        <input type="text" name="boatName" value="<%= reservation.boatName %>" placeholder="Bateau" required>
+                        <input type="date" name="startDate" value="<%= startDate.toISOString().split('T')[0] %>" required>
+                        <input type="date" name="endDate" value="<%= endDate.toISOString().split('T')[0] %>" required>
+                        <button type="submit">Modifier</button>
+                    </form>
+
+                    <form action="/gestionreservation/delete/<%= reservation._id %>" method="POST" style="display: inline;">
+                        <button type="submit" >Supprimer</button>
+                    </form>
+                </div>
+            </li>
+         <% }); %>    
+        </ul>
+     <p><a href="/dashboard">← Retour au Tableau de Bord</a></p>
+    </main>
+</body>
+</html>

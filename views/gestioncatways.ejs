@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Catways</title>
+</head>
+<body>
+    <header>
+        <h1>Gestion des Catways</h1>
+    </header>
+    <main>
+        <h2>Ajouter un Catway</h2>
+        <form action="/gestioncatways" method="post">
+            <label for="catwayNumber">Numéro de catway :</label>
+            <input type="number" id="catwayNumber" name="catwayNumber" required>
+
+            <label for="catwayType">Type de catway : </label>
+            <select name="catwayType" id="catwayType">
+                <option value="long">Long</option>
+                <option value="short">Court</option>
+            </select>
+
+             <label for="catwayState">Etat du catway :</label>
+            <input type="text" id="catwayState" name="catwayState" required>
+
+            <button type="submit">Créer</button>
+        </form>  
+
+        <div>
+            <h2>Catways : </h2>
+            <ul>
+             <% catways.forEach(function(catway) { %> 
+                <li>
+                    <div>
+                     Numéro : <%= catway.catwayNumber %> 
+                     Type : <%= catway.catwayType %>
+                     Etat : <%= catway.catwayState %>
+                    </div>
+
+                    <div>
+                        <form action="/gestioncatways/update/<%= catway.catwayNumber %>" method="post">
+                           <input type="text" name="catwayState" value="<%= catway.catwayState %>">
+                           <button type="submit">Modifier l'état</button> 
+                        </form>
+
+                        <form action="/gestioncatways/delete/<%= catway.catwayNumber %>" method="post">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                </li>
+             <% }); %>
+            </ul>
+        </div>
+        <p><a href="/dashboard">← Retour au Tableau de Bord</a></p>
+    </main>
+</body>
+</html>

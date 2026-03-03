@@ -1,0 +1,31 @@
+{
+  "name": "devoir-port-de-plaisance",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "env-cmd -f ./env/.env.dev node ./bin/www",
+    "dev": "env-cmd -f ./env/.env.dev node ./bin/www",
+    "prod": "env-cmd -f ./env/.env.prod node ./bin/www",
+    "doc": "jsdoc -c jsdoc.json"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-session": "^2.1.1",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^17.2.3",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.18.2",
+    "hbs": "^4.2.0",
+    "http-errors": "~1.6.3",
+    "mongoose": "^9.0.1",
+    "morgan": "~1.9.1",
+    "nodemon": "^3.1.11",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "env-cmd": "^11.0.0",
+    "jsdoc": "^4.0.5"
+  }
+}

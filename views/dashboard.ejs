@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Tableau de Bord - Port de Russell</h1>
+    <% if (user) { %>
+        <p>Bienvenue, <%= user.username %> .</p>
+        <p>Nous sommes le <%= new Date().toLocaleDateString('fr-FR') %>.</p>
+    <% } %>
+
+    <nav>
+        <ul>
+            <li><a href="/documentation">Documentation </a></li>
+            <li><a href="/gestioncatways">Gestion des Catways</a></li>
+            <li><a href="/gestionusers">Gestion des Utilisateurs</a></li>
+            <li><a href="/gestionreservation">Gestion des Réservations</a></li>
+            <li><a href="/logout">Se Déconnecter</a></li>
+        </ul>
+    </nav>
+
+    <h2>Réservations en cours</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Catway</th>
+                <th>Client</th>
+                <th>Bateau</th>
+                <th>Début</th>
+                <th>Fin</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (typeof reservations !== 'undefined' && reservations.length > 0) { %>
+                <% reservations.forEach(res => { %>
+                    <tr>
+                        <td><%= res.catwayNumber %></td>
+                        <td><%= res.clientName %></td>
+                        <td><%= res.boatName %></td>
+                        <td><%= new Date(res.startDate).toLocaleDateString() %></td>
+                        <td><%= new Date(res.endDate).toLocaleDateString() %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr><td colspan="5">Aucune réservation trouvée.</td></tr>
+            <% } %>
+        </tbody>
+    </table>
+    
+</body>
+</html>
