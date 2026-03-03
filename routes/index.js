@@ -175,6 +175,6 @@ router.get('/', function(req, res, next) {
 });
 
 /**
- * Exporte le module routeur pour utilisation dans l'application principale
+ * Exporte le module routeur 
  */
 module.exports = router;
