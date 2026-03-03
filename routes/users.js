@@ -118,6 +118,6 @@ router.delete('/:email', async (req, res) => {
 });
 
 /**
- * Exporte le module routeur pour utilisation dans l'application principale
+ * Exporte le module routeur 
  */
 module.exports = router;
